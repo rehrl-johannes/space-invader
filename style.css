@@ -1,0 +1,45 @@
+body {
+    margin: 0;
+}
+
+#game-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1vh 2rem;
+
+    font-family: "Roboto Light", sans-serif;
+    font-size: 2rem;
+}
+
+#sidebar p {
+    text-align: center;
+}
+
+#canvas {
+    padding-top: 1vh;
+    padding-right: 1vh;
+    padding-left: 1vh;
+}
+
+#new-game-button {
+    background-color: rgba(135, 206, 250, 1);
+    border-radius: 1rem;
+    border-color: darkblue;
+    padding: 1rem 3rem;
+}
+
+#new-game-button:hover {
+    background-color: rgba(135, 206, 250, 0.5);
+}
+
+#new-game-button:disabled {
+    background-color: lightgray;
+    border-color: darkgrey;
+}
