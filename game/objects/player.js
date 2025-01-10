@@ -1,30 +1,36 @@
 import { ObjectHandler } from "../services/object_handler.js";
 import { Projectile } from "./projectile.js";
 import { Direction } from "../enums/directions.js";
-import { CanvasHandler } from "../services/canvas_handler.js";
 import { DrawableObject } from "./drawable_object.js";
 import {ObjectType} from "../enums/object_type.js";
 
 export class Player extends DrawableObject{
 
-    constructor(id) {
-        super(id, ObjectType.PLAYER, { x: 0, y: 0 }, "game/assets/player.png")
+    constructor(id, keyMap) {
+        super(id, ObjectType.PLAYER, { x: 0, y: 0 }, "game/assets/player_" + id + ".png")
+        this.offsetMultiplier = parseInt(this.id);
+        this.keyMap = keyMap;
 
-        this.position = {
-            x: (CanvasHandler.getCanvas().width / 2) - this.getPositionCenterOffset().x,
-            y: (CanvasHandler.getCanvas().height - (this.getPositionCenterOffset().y * 2)) - 10
-        }
+        this.image.addEventListener('load', () => {
+            this.position = {
+                x: (this.canvas.width / 2) - this.getPositionCenterOffset().x,
+                y: (this.canvas.height - (this.getPositionCenterOffset().y * 2)) - 10
+            }
+        }, {once: true});
 
         this.activeKeys = [];
         this.velocity = { x: 0, y: 0 }
-        this.speedX = 5;
-        this.speedY = this.speedX / 2;
+        this.speed = { x: 5, y: 5 / 2};
 
         this.health = 3;
-        this.grace = true;
-        this.gracePeriod = 1000;
+        this.healthDisplay = []
+        for (let i = 0; i < this.health; i++) {
+            this.addHeartIcon(i);
+        }
 
-        setTimeout(() => {this.grace = false}, this.gracePeriod)
+        this.grace = true;
+        this.graceCall;
+        this.giveGrace(1000)
 
         this.reloadSpeed = 0.5;
         this.reloading = false;
@@ -32,18 +38,19 @@ export class Player extends DrawableObject{
         // Movement
         addEventListener('keydown', (event) => {
             if (this.activeKeys.includes(event.key)) return;
+
             switch (event.key) {
-                case 'w':
-                    this.velocity.y -= this.speedY;
+                case this.keyMap.UP:
+                    this.velocity.y -= this.speed.y;
                     break;
-                case 'a':
-                    this.velocity.x -= this.speedX;
+                case this.keyMap.LEFT:
+                    this.velocity.x -= this.speed.x;
                     break;
-                case 's':
-                    this.velocity.y += this.speedY;
+                case this.keyMap.DOWN:
+                    this.velocity.y += this.speed.y;
                     break;
-                case 'd':
-                    this.velocity.x += this.speedX;
+                case this.keyMap.RIGHT:
+                    this.velocity.x += this.speed.x;
                     break;
             }
             this.activeKeys.push(event.key);
@@ -52,17 +59,17 @@ export class Player extends DrawableObject{
         addEventListener('keyup', (event) => {
             if (!this.activeKeys.includes(event.key)) return;
             switch (event.key) {
-                case 'w':
-                    this.velocity.y += this.speedY;
+                case this.keyMap.UP:
+                    this.velocity.y += this.speed.y;
                     break;
-                case 'a':
-                    this.velocity.x += this.speedX;
+                case this.keyMap.LEFT:
+                    this.velocity.x += this.speed.x;
                     break;
-                case 's':
-                    this.velocity.y -= this.speedY;
+                case this.keyMap.DOWN:
+                    this.velocity.y -= this.speed.y;
                     break;
-                case 'd':
-                    this.velocity.x -= this.speedX;
+                case this.keyMap.RIGHT:
+                    this.velocity.x -= this.speed.x;
                     break;
             }
             this.activeKeys = this.activeKeys.filter(key => key !== event.key);
@@ -74,38 +81,59 @@ export class Player extends DrawableObject{
             ObjectHandler.removeObjectById(this.id);
         }
 
-        if ((this.position.x + this.velocity.x) + (this.getPositionCenterOffset().x * 2) <= CanvasHandler.getCanvas().width &&
+        if ((this.position.x + this.velocity.x) + (this.getPositionCenterOffset().x * 2) <= this.canvas.width &&
             (this.position.x + this.velocity.x) >= 0) {
             this.position.x += this.velocity.x;
         }
 
-        if ((this.position.y + this.velocity.y) + (this.getPositionCenterOffset().y * 2) <= CanvasHandler.getCanvas().height &&
+        if ((this.position.y + this.velocity.y) + (this.getPositionCenterOffset().y * 2) <= this.canvas.height &&
             (this.position.y + this.velocity.y) >= 0) {
             this.position.y += this.velocity.y;
         }
 
-        if (!this.reloading && this.activeKeys.includes(" ")) {
+        if (!this.reloading && this.activeKeys.includes(this.keyMap.SHOOT)) {
             this.shootGun();
         }
     }
 
-    collide(obj) {
-        if (this.grace) return;
+    draw() {
+        if (!this.image.complete) return;
 
-        if (obj.type === ObjectType.ENEMY ||
+        this.context.drawImage(this.image, this.position.x, this.position.y);
+
+        this.context.font = "bold 20px verdana, sans-serif";
+        this.context.fillStyle = "#ffffff";
+        this.context.textAlign = "start";
+        this.context.fillText("Player " + (parseInt(this.id) + 1).toString() + ":",
+            10,
+            (this.canvas.height - 10) - (this.offsetMultiplier * 25));
+        this.context.fillStyle = "#000000";
+
+        this.healthDisplay.forEach(hd => {
+           hd.draw();
+        });
+    }
+
+    collide(obj) {
+        if (obj.type === ObjectType.ITEM) {
+            obj.lootTable[Math.floor(Math.random() * (obj.lootTable.length))](this);
+        }
+
+        else if (obj.type === ObjectType.ENEMY ||
             (obj.type === ObjectType.PROJECTILE &&
                 ObjectHandler.getObjectById(obj.ownerId) &&
                 ObjectHandler.getObjectById(obj.ownerId).type === ObjectType.ENEMY) ||
             obj.type === ObjectType.PROJECTILE && !ObjectHandler.getObjectById(obj.ownerId)) {
-            this.health -= 1;
-            this.grace = true;
-
-            setTimeout(() => {this.grace = false}, this.gracePeriod)
+            if (!this.grace) {
+                this.health -= 1;
+                this.healthDisplay.pop();
+                this.giveGrace(2000);
+            }
         }
     }
 
     shootGun() {
-        ObjectHandler.addObject(new Projectile(this.id, this.getCenterPosition(), Direction.UP, 10, "game/assets/player_bullet.png"));
+        ObjectHandler.addObject(new Projectile(this.id, this.getCenterPosition(), Direction.UP, 25, "game/assets/player_" + this.id + "_bullet.png"));
         this.reloadGun();
     }
 
@@ -114,5 +142,34 @@ export class Player extends DrawableObject{
         setTimeout(() => {
            this.reloading = false;
         }, this.reloadSpeed * 1000);
+    }
+
+    giveGrace(gracePeriod) {
+        this.grace = true;
+
+        this.image.src = "game/assets/player_" + this.id + "_grace.png";
+
+        clearTimeout(this.graceCall);
+        this.graceCall = setTimeout(() => {
+            this.grace = false;
+            this.image.src = "game/assets/player_" + this.id + ".png";
+        }, gracePeriod)
+    }
+
+    addHeartIcon(index) {
+        this.healthDisplay.push(
+            new DrawableObject(
+                index.toString(),
+                ObjectType.ICON,
+                { x: 0, y: 0 },
+                "game/assets/health_icon.png"));
+        this.healthDisplay[index].image.addEventListener('load', () => {
+            this.healthDisplay[index].position = {
+                x: (130 - this.healthDisplay[index].getPositionCenterOffset().x) +
+                    (((this.healthDisplay[index].getPositionCenterOffset().x * 2) * index) + 3),
+                y: (this.canvas.height - this.healthDisplay[index].getPositionCenterOffset().y - 6) -
+                    this.healthDisplay[index].getPositionCenterOffset().y - (this.offsetMultiplier * 25)
+            };
+        }, {once: true});
     }
 }

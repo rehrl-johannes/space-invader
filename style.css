@@ -28,6 +28,37 @@ body {
     padding-left: 1vh;
 }
 
+#buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+#player-selection {
+    display: flex;
+}
+
+#player-selection button {
+    color: black;
+    background-color: white;
+    border-radius: 1rem;
+    border-color: darkgrey;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+}
+
+#player-selection button:last-child {
+    margin-left: 0.5rem;
+}
+
+#player-selection button:hover {
+    background-color: whitesmoke;
+}
+
+#player-selection button:disabled {
+    background-color: lightgray;
+    color: black;
+}
+
 #new-game-button {
     background-color: rgba(135, 206, 250, 1);
     border-radius: 1rem;

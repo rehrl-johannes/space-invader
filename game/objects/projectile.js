@@ -12,7 +12,7 @@ export class Projectile extends DrawableObject{
         this.position = { x: position.x - (this.image.width / 2), y: position.y - (this.image.height / 2)};
         this.grace = true;
 
-        setTimeout(() => {this.grace = false}, 500)
+        setTimeout(() => {this.grace = false}, 10)
     }
 
     update() {
@@ -35,8 +35,16 @@ export class Projectile extends DrawableObject{
     collide(obj) {
         if (obj.id === this.ownerId || this.grace) return;
 
-        if (ObjectHandler.getObjectById(this.ownerId).type === ObjectType.PLAYER && obj.type === ObjectType.ENEMY) {
+        if (!ObjectHandler.getObjectById(this.ownerId)) {
             ObjectHandler.removeObjectById(this.id);
+        }
+
+        else if (ObjectHandler.getObjectById(this.ownerId).type === ObjectType.PLAYER && obj.type === ObjectType.ENEMY) {
+            ObjectHandler.removeObjectById(this.id);
+        }
+
+        else if (ObjectHandler.getObjectById(this.ownerId).type === ObjectType.PLAYER && obj.type === ObjectType.ITEM) {
+            obj.lootTable[Math.floor(Math.random() * (obj.lootTable.length))](ObjectHandler.getObjectById(this.ownerId));
         }
 
         else if (ObjectHandler.getObjectById(this.ownerId).type === ObjectType.ENEMY && obj.type === ObjectType.PLAYER) {

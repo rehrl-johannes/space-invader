@@ -7,6 +7,9 @@ export class DrawableObject {
         this.position = position;
         this.image = new Image()
         this.image.src = imagePath;
+
+        this.context = CanvasHandler.getCanvasContext();
+        this.canvas = CanvasHandler.getCanvas();
     }
 
     getPositionCenterOffset() {
@@ -21,6 +24,7 @@ export class DrawableObject {
     }
 
     draw() {
-        CanvasHandler.getCanvasContext().drawImage(this.image, this.position.x, this.position.y);
+        if (!this.image.complete) return;
+        this.context.drawImage(this.image, this.position.x, this.position.y);
     }
 }

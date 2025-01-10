@@ -10,6 +10,10 @@
     <div id="game-container">
         <div id="sidebar">
             <p>
+                Wave:<br><br>
+                <span id="wave">0</span>
+            </p>
+            <p>
                 Score:<br><br>
                 <span id="score">0</span>
             </p>
@@ -17,7 +21,13 @@
                 Highscore:<br><br>
                 <span id="highscore">0</span>
             </p>
-            <button id="new-game-button">New Game</button>
+            <div id="buttons">
+                <div id="player-selection">
+                    <button id="single-player-button" disabled>Singleplayer</button>
+                    <button id="multi-player-button">Multiplayer</button>
+                </div>
+                <button id="new-game-button">New Game</button>
+            </div>
         </div>
         <div>
             <canvas id="canvas"></canvas>

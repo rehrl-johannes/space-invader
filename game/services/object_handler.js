@@ -1,5 +1,6 @@
 // singleton design pattern
 import {CanvasHandler} from "./canvas_handler.js";
+import {ObjectType} from "../enums/object_type.js";
 
 export const ObjectHandler = (function () {
     // private
@@ -36,8 +37,8 @@ export const ObjectHandler = (function () {
 
         clearOOB: function () {
             objects.forEach(obj => {
-                if ((obj.getCenterPosition().x < 0 || obj.getCenterPosition().x >= CanvasHandler.getCanvas().width) ||
-                    (obj.getCenterPosition().y < 0 || obj.getCenterPosition().y >= CanvasHandler.getCanvas().height)) {
+                if ((obj.getCenterPosition().x < 0 || obj.getCenterPosition().x > CanvasHandler.getCanvas().width) ||
+                    (obj.getCenterPosition().y < 0 || obj.getCenterPosition().y > CanvasHandler.getCanvas().height)) {
                     removalQueue.push(obj)
                 }
             });

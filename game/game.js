@@ -11,11 +11,14 @@ export const GameInstance = (function() {
     let image;
     let bgPosition;
 
+    let context = CanvasHandler.getCanvasContext();
+    let canvas = CanvasHandler.getCanvas();
+
     function update() {
         if(!running) return;
 
         if (bgPosition.y >= 0) {
-            bgPosition.y = CanvasHandler.getCanvas().height - (CanvasHandler.getCanvas().width * 9.25);
+            bgPosition.y = canvas.height - (canvas.width * 9.25);
         }
 
         bgPosition.y += 1;
@@ -40,14 +43,14 @@ export const GameInstance = (function() {
     function draw() {
         if(!running) return;
 
-        CanvasHandler.getCanvasContext().fillRect(0, 0, CanvasHandler.getCanvas().width, CanvasHandler.getCanvas().height);
+        context.fillRect(0, 0, canvas.width, canvas.height);
 
-        CanvasHandler.getCanvasContext().drawImage(
+        context.drawImage(
             image,
             bgPosition.x,
             bgPosition.y,
-            CanvasHandler.getCanvas().width,
-            CanvasHandler.getCanvas().width * 9.25);
+            canvas.width,
+            canvas.width * 9.25);
 
         ObjectHandler.getObjects().forEach((object) => {
             object.draw();
@@ -56,17 +59,19 @@ export const GameInstance = (function() {
 
     function gameOver() {
         running = false;
+
         document.getElementById("new-game-button").disabled = false;
         WaveHandler.stopWaving();
+        WaveHandler.endBossMode();
         ObjectHandler.clearAllObjects();
 
-        CanvasHandler.getCanvasContext().clearRect(0, 0, CanvasHandler.getCanvas().width, CanvasHandler.getCanvas().height);
-        CanvasHandler.getCanvasContext().fillStyle = "#000000";
-        CanvasHandler.getCanvasContext().fillRect(0, 0, CanvasHandler.getCanvas().width, CanvasHandler.getCanvas().height);
-        CanvasHandler.getCanvasContext().font = "bold 24px verdana, sans-serif ";
-        CanvasHandler.getCanvasContext().fillStyle = "#ff0000";
-        CanvasHandler.getCanvasContext().textAlign = "center";
-        CanvasHandler.getCanvasContext().fillText("GAME OVER", CanvasHandler.getCanvas().width / 2 ,CanvasHandler.getCanvas().height / 2);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#000000";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.font = "bold 50px verdana, sans-serif ";
+        context.fillStyle = "#ff0000";
+        context.textAlign = "center";
+        context.fillText("GAME OVER", canvas.width / 2 ,canvas.height / 2);
     }
 
     // public
@@ -75,8 +80,12 @@ export const GameInstance = (function() {
             running = true;
             image = new Image();
             image.src = "./game/assets/background.png";
-            bgPosition = {x: 0, y: CanvasHandler.getCanvas().height - (CanvasHandler.getCanvas().width * 9.25)};
+            bgPosition = {x: 0, y: canvas.height - (canvas.width * 9.25)};
             update();
+        },
+
+        stopGame: function() {
+            gameOver();
         }
     }
 })();

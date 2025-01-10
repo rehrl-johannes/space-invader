@@ -1,15 +1,14 @@
 import { ObjectHandler } from "../services/object_handler.js";
 import { Projectile } from "./projectile.js";
 import { Direction } from "../enums/directions.js";
-import { CanvasHandler } from "../services/canvas_handler.js";
 import { DrawableObject } from "./drawable_object.js";
 import {ObjectType} from "../enums/object_type.js";
 import {ScoreHandler} from "../services/score_handler.js";
 
-export class SimpleEnemy extends DrawableObject{
+export class SmallEnemy extends DrawableObject{
 
     constructor(id, position, velocity, reloadSpeed) {
-        super(id, ObjectType.ENEMY,{ x: 0, y: 0 }, "game/assets/enemy.png")
+        super(id, ObjectType.ENEMY, position, "game/assets/enemy.png")
 
         this.position = {
             x: position.x - this.getPositionCenterOffset().x,
@@ -23,7 +22,11 @@ export class SimpleEnemy extends DrawableObject{
         setTimeout(() => {this.grace = false}, 1000)
 
         this.reloadSpeed = reloadSpeed;
-        this.reloading = false;
+        this.reloading = true;
+
+        // initial shooting delay so they don't shoot at the same time
+        let shootingDelay = Math.random() * 3000;
+        setTimeout(() => { this.reloading = false }, shootingDelay)
     }
 
     update() {
@@ -32,9 +35,13 @@ export class SimpleEnemy extends DrawableObject{
             ScoreHandler.addPoints(10);
         }
 
-        if ((this.position.x + this.velocity.x) + (this.getPositionCenterOffset().x * 2)
-            > CanvasHandler.getCanvas().width ||
-            (this.position.x + this.velocity.x) < 0) {
+        if ((this.position.x + this.velocity.x) + (this.getPositionCenterOffset().x * 2) > this.canvas.width) {
+            this.position.x = this.canvas.width - (this.getPositionCenterOffset().x * 2);
+            this.velocity.x *= -1;
+        }
+
+        if ((this.position.x + this.velocity.x) < 0) {
+            this.position.x = 0;
             this.velocity.x *= -1;
         }
 
@@ -50,7 +57,9 @@ export class SimpleEnemy extends DrawableObject{
         if (this.grace) return;
 
         if (obj.type === ObjectType.PLAYER ||
-            obj.type === ObjectType.PROJECTILE && ObjectHandler.getObjectById(obj.ownerId).type === ObjectType.PLAYER) {
+            (obj.type === ObjectType.PROJECTILE &&
+                ObjectHandler.getObjectById(obj.ownerId) &&
+                ObjectHandler.getObjectById(obj.ownerId).type === ObjectType.PLAYER)) {
             this.health -= 1;
         }
     }
