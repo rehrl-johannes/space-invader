@@ -4,6 +4,11 @@ import {CanvasHandler} from "./canvas_handler.js";
 export const ObjectHandler = (function () {
     // private
     let objects = [];
+    let removalQueue = []
+
+    function removeObject(obj) {
+        objects.splice(objects.indexOf(obj), 1);
+    }
 
     // public
     return {
@@ -11,26 +16,37 @@ export const ObjectHandler = (function () {
             return objects;
         },
 
+        getObjectById: function (id) {
+            return objects.find(object => object.id === id);
+        },
+
         addObject: function (obj) {
             objects.push(obj);
         },
 
-        removeObject: function (obj) {
-            objects.splice(objects.indexOf(obj), 1);
+        removeObjectById: function (id) {
+            if (this.getObjectById(id)) {
+                removalQueue.push(this.getObjectById(id));
+            }
+        },
+
+        clearAllObjects: function () {
+            objects = [];
         },
 
         clearOOB: function () {
-            let objectsToRemove = []
             objects.forEach(obj => {
                 if ((obj.getCenterPosition().x < 0 || obj.getCenterPosition().x >= CanvasHandler.getCanvas().width) ||
                     (obj.getCenterPosition().y < 0 || obj.getCenterPosition().y >= CanvasHandler.getCanvas().height)) {
-                    objectsToRemove.push(obj)
+                    removalQueue.push(obj)
                 }
             });
 
-            objectsToRemove.forEach((obj) => {
-                this.removeObject(obj);
+            removalQueue.forEach((obj) => {
+                removeObject(obj);
             });
+
+            removalQueue = [];
         }
     };
 })();

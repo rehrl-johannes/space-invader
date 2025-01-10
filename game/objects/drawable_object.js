@@ -1,10 +1,12 @@
 import {CanvasHandler} from "../services/canvas_handler.js";
 
 export class DrawableObject {
-    constructor(position, imagePath) {
+    constructor(id, type, position, imagePath) {
+        this.id = id;
+        this.type = type;
+        this.position = position;
         this.image = new Image()
         this.image.src = imagePath;
-        this.position = position;
     }
 
     getPositionCenterOffset() {

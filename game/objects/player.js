@@ -3,11 +3,12 @@ import { Projectile } from "./projectile.js";
 import { Direction } from "../enums/directions.js";
 import { CanvasHandler } from "../services/canvas_handler.js";
 import { DrawableObject } from "./drawable_object.js";
+import {ObjectType} from "../enums/object_type.js";
 
 export class Player extends DrawableObject{
 
-    constructor() {
-        super({ x: 0, y: 0 }, "game/assets/player.png")
+    constructor(id) {
+        super(id, ObjectType.PLAYER, { x: 0, y: 0 }, "game/assets/player.png")
 
         this.position = {
             x: (CanvasHandler.getCanvas().width / 2) - this.getPositionCenterOffset().x,
@@ -18,6 +19,12 @@ export class Player extends DrawableObject{
         this.velocity = { x: 0, y: 0 }
         this.speedX = 5;
         this.speedY = this.speedX / 2;
+
+        this.health = 3;
+        this.grace = true;
+        this.gracePeriod = 1000;
+
+        setTimeout(() => {this.grace = false}, this.gracePeriod)
 
         this.reloadSpeed = 0.5;
         this.reloading = false;
@@ -63,6 +70,10 @@ export class Player extends DrawableObject{
     }
 
     update() {
+        if (this.health <= 0) {
+            ObjectHandler.removeObjectById(this.id);
+        }
+
         if ((this.position.x + this.velocity.x) + (this.getPositionCenterOffset().x * 2) <= CanvasHandler.getCanvas().width &&
             (this.position.x + this.velocity.x) >= 0) {
             this.position.x += this.velocity.x;
@@ -78,8 +89,23 @@ export class Player extends DrawableObject{
         }
     }
 
+    collide(obj) {
+        if (this.grace) return;
+
+        if (obj.type === ObjectType.ENEMY ||
+            (obj.type === ObjectType.PROJECTILE &&
+                ObjectHandler.getObjectById(obj.ownerId) &&
+                ObjectHandler.getObjectById(obj.ownerId).type === ObjectType.ENEMY) ||
+            obj.type === ObjectType.PROJECTILE && !ObjectHandler.getObjectById(obj.ownerId)) {
+            this.health -= 1;
+            this.grace = true;
+
+            setTimeout(() => {this.grace = false}, this.gracePeriod)
+        }
+    }
+
     shootGun() {
-        ObjectHandler.addObject(new Projectile(this.getCenterPosition(), Direction.UP, 10));
+        ObjectHandler.addObject(new Projectile(this.id, this.getCenterPosition(), Direction.UP, 10, "game/assets/player_bullet.png"));
         this.reloadGun();
     }
 
