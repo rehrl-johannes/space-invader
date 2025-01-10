@@ -68,6 +68,14 @@ export const WaveHandler = (function () {
             return;
         }
 
+        // first boss
+        if (waveIndex === 10) {
+            startBossMode();
+            clearTimeout(standardLoop);
+            standardLoop = setTimeout(standardWave.bind(this), 3000);
+            return;
+        }
+
         waveHTML.innerText = waveIndex.toString();
 
         // generate nr of enemies
@@ -102,11 +110,6 @@ export const WaveHandler = (function () {
         if (waveIndex === 3) {
             enemyParam.large.min = 1;
             enemyParam.large.max = 1;
-        }
-
-        // first boss
-        if (waveIndex === 10) {
-            startBossMode();
         }
 
         // scale enemy spawn rate with wave index
