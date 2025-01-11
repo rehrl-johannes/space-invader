@@ -238,7 +238,6 @@ export class BossEnemy extends DrawableObject{
         this.reloading = true;
         setTimeout(() => {
             this.reloading = false;
-            console.log("reloaded")
         }, this.reloadSpeed * 1000);
     }
 
