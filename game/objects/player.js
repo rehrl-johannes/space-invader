@@ -20,7 +20,7 @@ export class Player extends DrawableObject{
 
         this.activeKeys = [];
         this.velocity = { x: 0, y: 0 }
-        this.speed = { x: 5, y: 5 / 2};
+        this.speed = { x: 7, y: 7 / 2};
 
         this.health = 3;
         this.healthDisplay = []

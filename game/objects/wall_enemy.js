@@ -13,7 +13,7 @@ export class WallEnemy extends DrawableObject{
         setTimeout(() => {
             this.velocity = 20;
             this.image.src = "game/assets/wall_enemy_active.png";
-        }, 3000)
+        }, 2000)
     }
 
     update() {

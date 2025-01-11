@@ -68,12 +68,14 @@ export const WaveHandler = (function () {
             return;
         }
 
-        // first boss
-        if (waveIndex === 10) {
+        // boss every 10 waves
+        if (waveIndex > 0 && waveIndex % 10 === 0) {
             startBossMode();
             clearTimeout(standardLoop);
             standardLoop = setTimeout(standardWave.bind(this), 3000);
             waveIndex++;
+
+            waveHTML.innerText = "BOSS";
             return;
         }
 

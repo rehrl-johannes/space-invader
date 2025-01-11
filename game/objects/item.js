@@ -18,13 +18,13 @@ export class Item extends DrawableObject {
                 player.addHeartIcon(player.health - 1);
             },
             function (player) {
-                player.giveGrace(7000);
+                player.giveGrace(10000);
             },
             function (player) {
                 player.reloadSpeed = player.reloadSpeed / 2;
                 setTimeout(() => {
                     player.reloadSpeed = player.reloadSpeed * 2
-                }, 7000);
+                }, 10000);
             },
             // movement is quite clunky
             /*function (player) {
