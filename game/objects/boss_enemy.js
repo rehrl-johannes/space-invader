@@ -247,6 +247,7 @@ export class BossEnemy extends DrawableObject{
         this.reloadSpeed = 3;
         this.stageDelay = 1000;
         this.bulletVelocity = 6;
+        this.image.src = "game/assets/boss_enemy_phase_1.png";
 
         let initialXSign = 1;
 
@@ -282,6 +283,7 @@ export class BossEnemy extends DrawableObject{
         this.reloadSpeed = 2;
         this.stageDelay = 500;
         this.bulletVelocity = 7;
+        this.image.src = "game/assets/boss_enemy_phase_2.png";
 
         let initialXSign = 1;
 

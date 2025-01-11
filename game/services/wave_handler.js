@@ -73,6 +73,7 @@ export const WaveHandler = (function () {
             startBossMode();
             clearTimeout(standardLoop);
             standardLoop = setTimeout(standardWave.bind(this), 3000);
+            waveIndex++;
             return;
         }
 

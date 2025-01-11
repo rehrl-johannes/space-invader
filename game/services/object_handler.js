@@ -37,8 +37,8 @@ export const ObjectHandler = (function () {
 
         clearOOB: function () {
             objects.forEach(obj => {
-                if ((obj.getCenterPosition().x < 0 || obj.getCenterPosition().x > CanvasHandler.getCanvas().width) ||
-                    (obj.getCenterPosition().y < 0 || obj.getCenterPosition().y > CanvasHandler.getCanvas().height)) {
+                if ((obj.getCenterPosition().x < -10 || obj.getCenterPosition().x > CanvasHandler.getCanvas().width) ||
+                    (obj.getCenterPosition().y < -10 || obj.getCenterPosition().y > CanvasHandler.getCanvas().height)) {
                     removalQueue.push(obj)
                 }
             });
